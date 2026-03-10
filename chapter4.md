@@ -1283,7 +1283,1054 @@ Address ที่ปรากฏใน **Machine Instructions**
 และมักจะเกี่ยวข้องกับหน่วยที่เรียกว่า
 
 **Memory Management Unit (MMU)**
+cache-design-notes
+│
+├─ README.md
+├─ docs
+│  ├─ cache-design.md
+│  ├─ logical-vs-physical-cache.md
+│  ├─ cache-size.md
+│  └─ mapping-function.md
+│
+└─ images
+   ├─ logical-cache-diagram.png
+   └─ physical-cache-diagram.png
+# Computer Architecture – Cache Design Notes
 
+สรุปเนื้อหา **Cache Memory Design** จากบทเรียน Computer Architecture
+แปลไทยและจัดรูปแบบสำหรับอ่านบน GitHub
+
+---
+
+# Contents
+
+* Cache Design Elements
+* Logical vs Physical Cache
+* Cache Size
+* Cache Sizes of Processors
+* Mapping Function
+* Direct Mapping Example
+
+---
+
+# 1. Cache Design Elements
+
+| Element               | Options                                |
+| --------------------- | -------------------------------------- |
+| Cache Address         | Logical / Physical                     |
+| Cache Size            | ขนาดของ Cache                          |
+| Mapping Function      | Direct / Associative / Set-Associative |
+| Replacement Algorithm | LRU / FIFO / LFU / Random              |
+| Write Policy          | Write-through / Write-back             |
+| Line Size             | ขนาดของ Cache Line                     |
+| Number of Caches      | Single / Two Level / Unified / Split   |
+
+---
+
+# 2. Logical Cache vs Physical Cache
+
+## Logical Cache (Virtual Cache)
+
+Processor เข้าถึง Cache โดยใช้ **Virtual Address**
+
+```
+Processor
+   │
+Logical Address
+   │
+ Cache
+   │
+  MMU
+   │
+Physical Address
+   │
+Main Memory
+```
+
+### ข้อดี
+
+* เร็วกว่า
+* ไม่ต้องรอ MMU translate address
+
+### ข้อเสีย
+
+เกิดปัญหา
+
+**Virtual Address Alias**
+
+เพราะแต่ละ process ใช้ virtual address space เดียวกัน
+
+จึงต้อง
+
+* Flush cache ทุก context switch
+  หรือ
+* ใช้ Address Space Identifier
+
+---
+
+## Physical Cache
+
+Cache เก็บข้อมูลโดยใช้ **Physical Address**
+
+```
+Processor
+   │
+Logical Address
+   │
+  MMU
+   │
+Physical Address
+   │
+ Cache
+   │
+Main Memory
+```
+
+### ข้อดี
+
+ไม่มีปัญหา virtual alias
+
+### ข้อเสีย
+
+ต้องผ่าน MMU ก่อนจึงช้ากว่าเล็กน้อย
+
+---
+
+# 3. Cache Size
+
+เป้าหมายคือ
+
+```
+ทำให้ Cache ใหญ่ที่สุดเท่าที่เป็นไปได้
+```
+
+เพื่อให้เก็บข้อมูลจาก main memory ได้มาก
+
+ถ้า cache ใหญ่พอ
+
+```
+Average Memory Access Time ≈ Cache Access Time
+```
+
+แต่ cache ใหญ่เกินไปจะทำให้
+
+* Addressing logic ซับซ้อน
+* Access time เพิ่ม
+* Circuit ใหญ่ขึ้น
+
+ดังนั้นจึงไม่มี **cache size ที่ดีที่สุดค่าเดียว**
+
+เพราะขึ้นอยู่กับ **workload**
+
+---
+
+# 4. Cache Sizes of Some Processors
+
+| Processor             | Year | L1        | L2        | L3   |
+| --------------------- | ---- | --------- | --------- | ---- |
+| IBM 360/85            | 1968 | 16–32KB   | –         | –    |
+| PDP-11/70             | 1975 | 1KB       | –         | –    |
+| VAX 11/780            | 1978 | 16KB      | –         | –    |
+| IBM 3033              | 1978 | 64KB      | –         | –    |
+| Intel 80386           | 1989 | 8KB       | –         | –    |
+| Pentium               | 1993 | 8KB/8KB   | 256–512KB | –    |
+| PowerPC G4            | 1999 | 32KB/32KB | 256KB–1MB | 2MB  |
+| Pentium 4             | 2000 | 8KB/8KB   | 256KB     | –    |
+| Itanium               | 2001 | 16KB/16KB | 96KB      | 4MB  |
+| IBM POWER5            | 2003 | 64KB      | 1.9MB     | 36MB |
+| IBM POWER6            | 2007 | 64KB/64KB | 4MB       | 32MB |
+| Intel Core i7 Extreme | 2011 | 6×32KB    | 1.5MB     | 12MB |
+
+หมายเหตุ
+
+```
+8KB/8KB = Instruction Cache / Data Cache
+```
+
+---
+
+# 5. Mapping Function
+
+เพราะว่า
+
+```
+จำนวน Cache Lines < จำนวน Memory Blocks
+```
+
+จึงต้องมี algorithm สำหรับ
+
+```
+Mapping Main Memory Block → Cache Line
+```
+
+มี 3 เทคนิคหลัก
+
+1. Direct Mapping
+2. Associative Mapping
+3. Set-Associative Mapping
+
+---
+
+# 6. Example
+
+กำหนดว่า
+
+* Cache = **64KB**
+* Block size = **4 bytes**
+* Cache line = **4 bytes**
+* Main memory = **16MB**
+* Address size = **24 bits**
+
+เพื่อความง่ายในการอธิบาย
+
+ใช้ main memory ขนาด
+
+```
+4MB
+```
+
+แบ่งเป็น block ขนาด
+
+```
+4 bytes
+```
+
+---
+
+# 7. Direct Mapping
+
+เทคนิคที่ง่ายที่สุด
+
+```
+Main Memory Block
+→ Map ไปได้ Cache Line เดียว
+```
+
+สูตร
+
+```
+i = j mod m
+```
+
+โดย
+
+| Symbol | Meaning               |
+| ------ | --------------------- |
+| i      | Cache Line Number     |
+| j      | Memory Block Number   |
+| m      | Number of Cache Lines |
+
+ตัวอย่าง
+
+```
+Block 0 → Line 0
+Block 1 → Line 1
+Block m → Line 0
+Block m+1 → Line 1
+```
+
+---
+
+# Author
+
+Computer Architecture Study Notes
+แปลและจัดรูปแบบสำหรับการเรียน
+# Cache Mapping (Direct & Associative)
+
+> Computer Architecture Notes  
+> สรุปการทำงานของ Cache Memory Mapping จากภาพ Figure 4.8 – 4.10
+
+---
+
+# Figure 4.8 – Mapping from Main Memory to Cache
+
+## (a) Direct Mapping
+
+First **m blocks of main memory**  
+(equal to size of cache)
+
+Cache memory
+
+- `b` = length of block in bits  
+- `t` = length of tag in bits  
+
+### คำแปล
+
+บล็อก **m บล็อกแรกของหน่วยความจำหลัก**  
+(มีขนาดรวมเท่ากับ cache)
+
+หน่วยความจำ Cache
+
+- `b` = ขนาดของ block (หน่วยเป็นบิต)  
+- `t` = ขนาดของ tag (หน่วยเป็นบิต)
+
+---
+
+## (b) Associative Mapping
+
+One block of main memory  
+สามารถถูกวางไว้ที่ **cache line ใดก็ได้**
+
+### คำแปล
+
+หนึ่ง block จาก main memory  
+สามารถถูกเก็บไว้ใน **cache line ใดก็ได้ใน cache**
+
+---
+
+# Direct Mapping Concept
+
+Mapping ของ main memory ไปยัง cache ทำดังนี้
+
+```
+Bm → Lq
+```
+
+โดย
+
+```
+q = m mod number_of_cache_lines
+```
+
+ตัวอย่าง
+
+```
+B11 → L3
+```
+
+---
+
+# Address Structure
+
+Main Memory Address ถูกแบ่งเป็น
+
+```
++------+-------+------+
+| Tag  | Line  | Word |
++------+-------+------+
+```
+
+คำอธิบาย
+
+| Field | Meaning |
+|------|------|
+| Tag | ใช้ตรวจสอบว่า block ที่อยู่ใน cache เป็น block ที่ต้องการหรือไม่ |
+| Line | ระบุ cache line |
+| Word | ระบุ word หรือ byte ภายใน block |
+
+---
+
+# Address and Cache Parameters
+
+ให้
+
+```
+s = number of bits for main memory block
+r = number of bits for cache line
+w = number of bits for word
+```
+
+---
+
+## Address length
+
+```
+Address length = (s + w) bits
+```
+
+---
+
+## Number of addressable units
+
+```
+2^(s+w) words หรือ bytes
+```
+
+---
+
+## Block size
+
+```
+Block size = line size = 2^w words หรือ bytes
+```
+
+---
+
+## Number of blocks in main memory
+
+```
+2^(s+w) / 2^w = 2^s
+```
+
+---
+
+## Number of lines in cache
+
+```
+m = 2^r
+```
+
+---
+
+## Cache size
+
+```
+Cache size = 2^(r+w) words หรือ bytes
+```
+
+---
+
+## Tag size
+
+```
+Tag size = (s − r) bits
+```
+
+---
+
+# Figure 4.9 – Direct-Mapping Cache Organization
+
+Memory Address
+
+```
++------+-------+------+
+| Tag  | Line  | Word |
++------+-------+------+
+```
+
+การทำงาน
+
+1. CPU ส่ง Memory Address
+2. ส่วน **Line** ใช้เลือก cache line
+3. ส่วน **Tag** ใช้เปรียบเทียบกับ tag ที่เก็บใน cache
+4. ถ้าเท่ากัน → **Cache Hit**
+5. ถ้าไม่เท่ากัน → **Cache Miss**
+
+---
+
+# Cache Result
+
+```
+0 → Hit in cache
+1 → Miss in cache
+```
+
+---
+
+# Example 4.2a – Direct Mapping Example
+
+ระบบตัวอย่างใช้ **Direct Mapping**
+
+```
+m = 16K = 2^14
+```
+
+Mapping function
+
+```
+j = i mod 2^14
+```
+
+---
+
+# Cache Line Mapping
+
+| Cache Line | Starting Memory Address |
+|------------|------------------------|
+| 0 | 000000, 010000, ..., FF000 |
+| 1 | 000004, 010004, ..., FF004 |
+| ... | ... |
+| 2^14 − 1 | 00FFFC, 01FFFC, ..., FFFFFC |
+
+---
+
+# Example Address Format
+
+Main memory
+
+```
+16 MB
+```
+
+Address size
+
+```
+24-bit address
+```
+
+Address format
+
+```
++--------+-------------+------+
+| Tag    | Line        | Word |
++--------+-------------+------+
+| 8 bits | 14 bits     | 2 bits |
+```
+
+---
+
+# Example Operation
+
+สมมุติ
+
+```
+Tag = 16
+Line = 0CE7
+```
+
+Cache จะตรวจสอบว่า
+
+```
+Tag ใน line 0CE7
+ตรงกับ Tag ของ address หรือไม่
+```
+
+ถ้าตรง
+
+```
+Cache Hit
+```
+
+ถ้าไม่ตรง
+
+```
+Cache Miss
+```
+
+เมื่อเกิด miss
+
+ระบบจะใช้
+
+```
+Tag + Line
+```
+
+ต่อกับ
+
+```
+00
+```
+
+เพื่อดึงข้อมูล **4 bytes** จาก main memory
+
+---
+
+# Figure 4.10 – Direct Mapping Example
+
+การกำหนด block ของ main memory ไปยัง cache
+
+| Cache line | Main memory blocks assigned |
+|-------------|----------------------------|
+| 0 | 0, m, 2m, ..., 2^s − m |
+| 1 | 1, m+1, 2m+1, ..., 2^s − m + 1 |
+| ... | ... |
+| m−1 | m−1, 2m−1, 3m−1, ..., 2^s − 1 |
+
+---
+
+# Direct Mapping Summary
+
+Direct Mapping
+
+```
+Main Memory Block
+        ↓
+Cache Line เดียวที่กำหนดไว้
+```
+
+ข้อดี
+
+```
+✔ Hardware simple
+✔ Fast implementation
+```
+
+ข้อเสีย
+
+```
+✘ Conflict Miss เกิดง่าย
+✘ หลาย block อาจ map มาที่ line เดียวกัน
+```
+
+---
+
+# Associative Mapping Summary
+
+Associative Mapping
+
+```
+Main Memory Block
+        ↓
+Any Cache Line
+```
+
+CPU ต้อง
+
+```
+Compare Tag กับทุก cache line
+```
+
+---
+
+# Notes
+
+ค่าของ memory
+
+```
+Binary → ใช้กับ address
+Hexadecimal → ใช้แสดงค่า memory
+```
+# Cache Mapping (Associative & Set-Associative)
+
+> Computer Architecture Notes  
+> เนื้อหาจาก Figure 4.11 – 4.12
+
+---
+
+# Direct Mapping Limitation
+
+Direct Mapping มีข้อจำกัดคือ
+
+```
+Fixed cache location for each block
+```
+
+หมายความว่า
+
+Main Memory Block แต่ละตัว  
+จะถูก map ไปยัง **Cache Line เดียวเท่านั้น**
+
+### ปัญหาที่เกิดขึ้น
+
+ถ้าโปรแกรมอ้างอิง block หลายตัวที่ map ไป line เดียวกัน
+
+```
+Cache blocks จะถูกสลับเข้าออกตลอดเวลา
+```
+
+ผลที่เกิดขึ้น
+
+```
+Hit ratio ต่ำ
+```
+
+ปรากฏการณ์นี้เรียกว่า
+
+```
+Thrashing
+```
+
+---
+
+# Victim Cache
+
+วิธีลดปัญหา miss
+
+```
+Victim Cache
+```
+
+แนวคิด
+
+Block ที่ถูกแทนที่ (discarded block)
+
+```
+เก็บไว้ใน cache ขนาดเล็กอีกชั้น
+```
+
+ถ้า block นั้นถูกใช้ซ้ำ
+
+```
+สามารถนำกลับมาใช้ได้ทันที
+```
+
+---
+
+# Associative Mapping
+
+Associative Mapping แก้ปัญหาของ Direct Mapping
+
+```
+Main Memory Block
+        ↓
+Any Cache Line
+```
+
+กล่าวคือ
+
+```
+Block ใด ๆ สามารถถูกเก็บใน cache line ใดก็ได้
+```
+
+---
+
+# Address Structure (Associative Mapping)
+
+Memory Address
+
+```
++--------+------+
+|  Tag   | Word |
++--------+------+
+```
+
+ไม่มี field สำหรับ **line**
+
+เพราะ block สามารถไปอยู่ **line ใดก็ได้**
+
+---
+
+# Cache Search
+
+เมื่อ CPU ต้องการข้อมูล
+
+Cache จะทำ
+
+```
+Compare Tag with every cache line
+```
+
+ถ้า
+
+```
+Tag match → Cache Hit
+```
+
+ถ้า
+
+```
+Tag mismatch → Cache Miss
+```
+
+---
+
+# Figure 4.11 – Fully Associative Cache Organization
+
+การทำงาน
+
+```
+Memory Address
+      │
+      ▼
++-----------+
+| Tag |Word |
++-----------+
+      │
+      ▼
+Compare with ALL cache tags
+      │
+ ┌────┴────┐
+ │         │
+Hit       Miss
+```
+
+---
+
+# Example 4.2b – Associative Mapping Example
+
+Figure 4.12 แสดงตัวอย่าง associative mapping
+
+Main memory address ประกอบด้วย
+
+```
+22-bit tag
+2-bit byte number
+```
+
+ดังนั้น
+
+```
+Address = 24 bits
+```
+
+---
+
+# Example Address
+
+ตัวอย่าง address
+
+```
+16339C (hex)
+```
+
+Binary
+
+```
+0001 0110 0011 0011 1001 1100
+```
+
+Tag (22 bits)
+
+```
+0001 0110 0011 0011 1001 11
+```
+
+Word
+
+```
+00
+```
+
+---
+
+# Memory Address Structure
+
+```
++----------------------+------+
+|        Tag           | Word |
++----------------------+------+
+|       22 bits        | 2 bits |
+```
+
+---
+
+# Example Cache Data
+
+ตัวอย่างข้อมูลใน cache
+
+| Tag | Data | Line |
+|----|------|------|
+| 3FFFED | 33333333 | 3FFD |
+| 000000 | 13579246 | 0000 |
+| 3FFFFF | 24682468 | 3FFF |
+
+---
+
+# Associative Mapping Parameters
+
+Note:
+
+```
+Address ไม่มี field ที่ระบุ line number
+```
+
+ดังนั้น
+
+```
+จำนวน line ใน cache
+ไม่ได้ถูกกำหนดโดย address
+```
+
+---
+
+# Important Parameters
+
+## Address length
+
+```
+(s + w) bits
+```
+
+---
+
+## Number of addressable units
+
+```
+2^(s+w) words or bytes
+```
+
+---
+
+## Block size
+
+```
+2^w words or bytes
+```
+
+---
+
+## Number of blocks in main memory
+
+```
+2^(s+w) / 2^w = 2^s
+```
+
+---
+
+## Number of lines in cache
+
+```
+Undetermined
+```
+
+---
+
+## Tag size
+
+```
+Tag = s bits
+```
+
+---
+
+# Associative Mapping Advantage
+
+ข้อดี
+
+```
+✔ Flexible block placement
+✔ ลด conflict miss
+✔ เพิ่ม hit ratio
+```
+
+---
+
+# Associative Mapping Disadvantage
+
+ข้อเสีย
+
+```
+✘ Hardware ซับซ้อน
+✘ ต้อง compare ทุก cache line
+```
+
+---
+
+# Cache Time Analysis
+
+การตรวจสอบ tag ของทุก line พร้อมกัน
+
+```
+Parallel comparison
+```
+
+ทำให้ต้องใช้
+
+```
+Complex circuitry
+```
+
+---
+
+# Set-Associative Mapping
+
+Set-Associative Mapping เป็น **การผสมระหว่าง**
+
+```
+Direct Mapping
+Associative Mapping
+```
+
+---
+
+# Cache Structure
+
+Cache แบ่งออกเป็น
+
+```
+Sets
+```
+
+แต่ละ set มีหลาย line
+
+---
+
+# Relationship
+
+```
+m = v × k
+```
+
+โดย
+
+| Symbol | Meaning |
+|------|------|
+| m | number of cache lines |
+| v | number of sets |
+| k | lines per set |
+
+---
+
+# Mapping Function
+
+```
+i = j mod v
+```
+
+โดย
+
+| Symbol | Meaning |
+|------|------|
+| i | cache set number |
+| j | main memory block number |
+
+---
+
+# Mapping Behavior
+
+Main Memory Block
+
+```
+Block j
+```
+
+จะ map ไปยัง
+
+```
+Set i
+```
+
+แต่สามารถอยู่ได้ใน
+
+```
+Any line within that set
+```
+
+---
+
+# Example
+
+ถ้า
+
+```
+4-way set associative cache
+```
+
+แต่ละ set จะมี
+
+```
+4 lines
+```
+
+Block ที่ map ไป set เดียวกัน
+
+```
+สามารถอยู่ line ใดก็ได้ใน set
+```
+
+---
+
+# Set-Associative Summary
+
+Direct Mapping
+
+```
+Block → 1 line
+```
+
+Associative Mapping
+
+```
+Block → Any line
+```
+
+Set Associative
+
+```
+Block → Any line in a specific set
+```
+
+---
+
+# Comparison
+
+| Mapping Type | Flexibility | Hardware Complexity |
+|--------------|-------------|--------------------|
+| Direct | Low | Low |
+| Associative | High | High |
+| Set Associative | Medium | Medium |
+
+---   
 
 
 
