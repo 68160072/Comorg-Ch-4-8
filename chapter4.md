@@ -114,9 +114,816 @@
 ลักษณะที่สำคัญอย่างหนึ่งของหน่วยความจำคือ **ความจุ (Capacity)**
 
 สำหรับ **Internal Memory** ความจุมักแสดงในรูปของ
+---
+
+# Table 4.1 ลักษณะสำคัญของระบบหน่วยความจำคอมพิวเตอร์  
+(Key Characteristics of Computer Memory Systems)
+
+| Category | Description |
+|---|---|
+| **Location** | Internal (เช่น processor registers, cache, main memory) <br> External (เช่น optical disks, magnetic disks, tapes) |
+| **Capacity** | Number of words <br> Number of bytes |
+| **Unit of Transfer** | Word <br> Block |
+| **Access Method** | Sequential <br> Direct <br> Random <br> Associative |
+| **Performance** | Access time <br> Cycle time <br> Transfer rate |
+| **Physical Type** | Semiconductor <br> Magnetic <br> Optical <br> Magneto-optical |
+| **Physical Characteristics** | Volatile / Nonvolatile <br> Erasable / Nonerasable |
+| **Organization** | Memory modules |
+
+---
+
+# แนวคิดเกี่ยวกับ Unit of Transfer
+
+แนวคิดที่เกี่ยวข้องคือ **หน่วยของการถ่ายโอนข้อมูล (Unit of Transfer)**
+
+สำหรับ **หน่วยความจำภายใน (Internal Memory)**  
+หน่วยของการถ่ายโอนข้อมูลจะเท่ากับจำนวน **สายสัญญาณไฟฟ้า (electrical lines)** ที่ใช้รับและส่งข้อมูลเข้าออกจาก **Memory Module**
+
+โดยปกติแล้วค่าดังกล่าวจะเท่ากับ **Word Length**  
+แต่ในบางระบบอาจแตกต่างกัน เช่น
+
+ตัวอย่างเช่น **Cray C90 Supercomputer**  
+ใช้ความยาว **64-bit word** แต่ใช้ **64-bit integer representation**
+
+ในสถาปัตยกรรม **Intel x86**  
+มีความยาวคำสั่ง (instruction) หลายแบบ และ word size เท่ากับ **32 bits**
+
+---
+
+# แนวคิดที่เกี่ยวข้องกับหน่วยความจำภายใน
+
+## Word
+
+คำว่า **Word** หมายถึงหน่วยพื้นฐานของการจัดโครงสร้างหน่วยความจำ
+
+ขนาดของ Word มักจะเท่ากับ
+
+- จำนวนบิตที่ใช้แทนค่า **integer**
+- หรือขนาดของ **instruction**
+
+อย่างไรก็ตาม ในหลายระบบอาจมีข้อยกเว้น
+
+ตัวอย่างเช่น
+
+- **Cray C90 Supercomputer**  
+  ใช้ integer representation 64 บิต
+
+- **Intel x86 architecture**  
+  ใช้ word ขนาด **32 bits**
+
+---
+
+## Addressable Units
+
+ในระบบส่วนใหญ่ **Address** จะระบุหน่วยข้อมูลเป็น **Byte**
+
+ในกรณีนี้ความสัมพันธ์ระหว่าง
+
+- ความยาวของ Address = **A**
+- จำนวนหน่วยที่สามารถอ้างถึงได้ = **N**
+
+จะเป็น
+
 
 - Bytes  
 - Words
 
 โดยที่
+
+---
+
+## Unit of Transfer
+
+สำหรับ **Internal Memory**
+
+จำนวนบิตที่อ่านหรือเขียนในแต่ละครั้งจะเท่ากับ
+
+- Word
+- หรือ Addressable Unit
+
+สำหรับ **External Memory**
+
+ข้อมูลจะถูกส่งเป็นหน่วยที่ใหญ่กว่า Word  
+ซึ่งเรียกว่า
+
+**Blocks**
+
+---
+
+# วิธีการเข้าถึงข้อมูลในหน่วยความจำ  
+(Method of Accessing Units of Data)
+
+อีกหนึ่งลักษณะที่สำคัญของหน่วยความจำคือ  
+**วิธีการเข้าถึงข้อมูล**
+
+มีหลายรูปแบบ ได้แก่
+
+- Sequential
+- Direct
+- Random
+- Associative
+
+---
+
+## Sequential Access
+
+หน่วยความจำถูกจัดเป็นหน่วยข้อมูลที่เรียกว่า **Records**
+
+การเข้าถึงข้อมูลจะทำตามลำดับเชิงเส้น
+
+เพื่ออ่านหรือเขียน **Record ที่ n**
+
+ระบบต้อง
+
+1. เริ่มจากตำแหน่งปัจจุบัน
+2. เลื่อนไปตามลำดับ
+3. จนถึง Record ที่ต้องการ
+
+ดังนั้น
+
+**เวลาในการเข้าถึงข้อมูลจึงแปรผันตามตำแหน่งของข้อมูล**
+
+ตัวอย่างอุปกรณ์ที่ใช้ Sequential Access
+
+- **Magnetic Tape**
+
+---
+
+## Direct Access
+
+คล้ายกับ Sequential Access เพราะใช้
+
+**read-write mechanism ร่วมกัน**
+
+แต่แตกต่างตรงที่
+
+แต่ละ **Block หรือ Record**
+
+จะมี **Address เฉพาะ**
+
+ทำให้สามารถเข้าถึงตำแหน่งข้อมูลได้โดยตรงมากขึ้น
+แม้ว่าบางครั้งอาจยังต้องมีการเลื่อนตำแหน่งของอุปกรณ์ก่อนอ่านข้อมูล
+---
+
+# Random Access
+
+แต่ละตำแหน่งที่สามารถอ้างถึงได้ในหน่วยความจำจะมี **กลไกการอ่าน/เขียน (read-write mechanism)** ที่สามารถเข้าถึงได้โดยตรง
+
+เวลาในการเข้าถึงตำแหน่งใดตำแหน่งหนึ่ง
+
+- ไม่ขึ้นกับลำดับของการเข้าถึงก่อนหน้า
+- มีค่า **คงที่ (constant)**
+
+ดังนั้นตำแหน่งใด ๆ ในหน่วยความจำสามารถถูกเลือกแบบสุ่ม และเข้าถึงได้โดยตรง
+
+ตัวอย่างหน่วยความจำประเภทนี้
+
+- **Main Memory**
+- **Some Cache Systems**
+
+---
+
+# Associative Access
+
+เป็นรูปแบบการเข้าถึงหน่วยความจำที่หายากกว่า ซึ่งทำให้สามารถ
+
+- เปรียบเทียบ **บิตที่ต้องการค้นหา**
+- กับ **ตำแหน่งบิตจำนวนมาก**
+
+ได้ **พร้อมกัน**
+
+คำจะถูกดึงออกจากหน่วยความจำโดย **พิจารณาจากเนื้อหาบางส่วนของข้อมูล** มากกว่าที่อยู่ของข้อมูล
+
+เหมือนกับ **Random Access Memory**
+
+- แต่ละตำแหน่งจะมี **กลไก address ของตัวเอง**
+- เวลาในการดึงข้อมูลจะ **คงที่**
+
+**Cache Memory บางระบบใช้ Associative Access**
+
+---
+
+# Characteristics of Memory Performance
+
+จากมุมมองของผู้ใช้  
+ลักษณะที่สำคัญที่สุดของหน่วยความจำมีสองอย่างคือ
+
+1. **Capacity (ความจุ)**
+2. **Performance (ประสิทธิภาพ)**
+
+---
+
+## Access Time (Latency)
+
+สำหรับ **Random Access Memory**
+
+Access Time คือ
+
+> เวลาที่ใช้ในการทำการอ่านหรือเขียนข้อมูล
+
+เริ่มตั้งแต่
+
+- เวลาที่ **address ถูกส่งไปยังหน่วยความจำ**
+
+จนถึง
+
+- เวลาที่ **ข้อมูลพร้อมใช้งาน**
+
+สำหรับ **Non-Random Access Memory**
+
+Access Time คือ
+
+> เวลาที่ใช้ในการเลื่อนตำแหน่งของกลไกอ่าน/เขียนไปยังตำแหน่งข้อมูลที่ต้องการ
+
+---
+
+## Memory Cycle Time
+
+ค่าคงที่นี้ใช้กับ **Random Access Memory**
+
+ประกอบด้วย
+
+- Access Time
+- เวลาที่ต้องใช้ก่อนที่จะสามารถเริ่มการเข้าถึงครั้งถัดไป
+
+เวลาส่วนนี้อาจจำเป็นสำหรับ
+
+- การเปลี่ยนสถานะของสัญญาณ
+- การทำให้ bus หรือหน่วยความจำกลับสู่สภาพเดิม
+
+---
+
+## Transfer Rate
+
+คือ **อัตราความเร็วในการส่งข้อมูลเข้า/ออกจากหน่วยความจำ**
+
+สำหรับ **Random Access Memory**
+
+สำหรับ **Non-Random Access Memory**
+
+มีความสัมพันธ์ดังนี้
+
+### โดยที่
+
+| Symbol | Meaning |
+|------|------|
+| Tn | เวลาเฉลี่ยในการอ่านหรือเขียน n บิต |
+| TA | เวลาเฉลี่ยในการเข้าถึงข้อมูล |
+| n | จำนวนบิต |
+| R | อัตราการถ่ายโอนข้อมูล (bits per second) |
+
+---
+
+# Physical Types of Memory
+
+มีเทคโนโลยีหลายประเภทที่ใช้สร้างหน่วยความจำ
+
+ประเภทที่พบมากที่สุดคือ
+
+- **Semiconductor Memory**
+- **Magnetic Surface Memory** (ใช้ใน disk และ tape)
+- **Optical Memory**
+- **Magneto-Optical Memory**
+
+---
+
+# Physical Characteristics of Data Storage
+
+ลักษณะทางกายภาพของการจัดเก็บข้อมูลมีความสำคัญ เช่น
+
+## Volatile Memory
+
+ข้อมูลจะ **หายไปเมื่อไฟฟ้าถูกปิด**
+
+---
+
+## Nonvolatile Memory
+
+ข้อมูลยังคงอยู่แม้ **ไม่มีไฟฟ้า**
+
+ตัวอย่าง
+
+- Magnetic disk
+- Magnetic tape
+
+---
+
+## Semiconductor Memory
+
+หน่วยความจำเซมิคอนดักเตอร์อาจเป็น
+
+- **Volatile**
+- **Nonvolatile**
+
+---
+
+## Nonerasable Memory
+
+หน่วยความจำประเภทนี้
+
+- ไม่สามารถลบข้อมูลได้
+- ยกเว้นการ **ทำลายตัวหน่วยความจำ**
+
+หน่วยความจำเซมิคอนดักเตอร์ประเภทนี้เรียกว่า
+
+**ROM (Read-Only Memory)**
+
+ในทางปฏิบัติจะใช้ **ROM ที่สามารถโปรแกรมได้**
+
+---
+
+# Organization of Memory
+
+สำหรับ **Random Access Memory**
+
+คำว่า **Organization** หมายถึง
+
+> การจัดเรียงบิตทางกายภาพเพื่อสร้างเป็น Word
+
+อย่างไรก็ตามการจัดเรียงที่ชัดเจนนี้ **ไม่ได้ถูกใช้เสมอไป**
+
+รายละเอียดเพิ่มเติมจะกล่าวใน **Chapter 5**
+
+---
+
+# The Memory Hierarchy
+
+ข้อจำกัดของการออกแบบหน่วยความจำของคอมพิวเตอร์สามารถสรุปได้ด้วยคำถามสามข้อ
+
+1. **How much?** (ต้องการความจุเท่าไร)
+2. **How fast?** (ต้องการความเร็วเท่าไร)
+3. **How expensive?** (ต้นทุนเท่าไร)
+
+---
+
+## Capacity Question
+
+คำถามเรื่องความจุค่อนข้างเปิดกว้าง
+
+ถ้ามีความจุมากพอ  
+ก็จะมีการพัฒนาแอปพลิเคชันให้ใช้ความจุนั้น
+
+---
+
+## Speed Question
+
+ความเร็วมีความสำคัญมาก
+
+ถ้า **processor ทำงานเร็วมาก**  
+แต่ **memory ช้า**
+
+processor จะต้อง **รอข้อมูล**
+
+---
+
+## Cost Question
+
+ต้นทุนของหน่วยความจำต้องมีความสมเหตุสมผล  
+เมื่อเทียบกับองค์ประกอบอื่นของระบบ
+
+---
+
+# Trade-off of Memory Design
+
+มี **trade-off** ระหว่าง
+
+- Access time
+- Cost
+- Capacity
+
+เทคโนโลยีหน่วยความจำจึงมีลักษณะดังนี้
+
+- Access time เร็ว → cost ต่อบิตสูง
+- Capacity สูง → cost ต่อบิตต่ำ
+- Capacity สูง → access time ช้า
+
+---
+
+# Problem of Memory Design
+
+นักออกแบบต้องการ
+
+- หน่วยความจำ **ความจุสูง**
+- **ราคาถูก**
+- **เร็ว**
+
+แต่สิ่งเหล่านี้ **ขัดแย้งกัน**
+
+ดังนั้นจึงใช้แนวคิด
+
+# Memory Hierarchy
+
+แทนที่จะใช้หน่วยความจำชนิดเดียว
+
+---
+
+# แนวคิดของ Memory Hierarchy
+
+เมื่อไล่ลงตามลำดับชั้นของหน่วยความจำ
+
+จะเกิดสิ่งต่อไปนี้
+
+a. **Cost per bit ลดลง**  
+b. **Capacity เพิ่มขึ้น**  
+c. **Access time เพิ่มขึ้น**  
+d. **Frequency of access ลดลง**
+
+---
+
+# Structure of Memory Hierarchy
+
+หน่วยความจำในระบบคอมพิวเตอร์แบ่งเป็นชั้นต่าง ๆ เช่น
+
+### Inboard Memory
+- Registers
+- Cache
+- Main Memory
+
+### Outboard Storage
+- Magnetic Disk
+- CD-ROM
+- CD-RW
+- DVD-RW
+- DVD-RAM
+- Blu-Ray
+
+### Offline Storage
+- Magnetic Tape
+
+---
+
+# Figure 4.1 Memory Hierarchy
+
+หน่วยความจำที่
+
+- **เล็กกว่า**
+- **แพงกว่า**
+- **เร็วกว่า**
+
+จะถูกเสริมด้วยหน่วยความจำที่
+
+- **ใหญ่กว่า**
+- **ถูกกว่า**
+- **ช้ากว่า**
+
+---
+
+# Locality of Reference
+
+แนวคิดสำคัญที่ทำให้ **Memory Hierarchy ทำงานได้**
+
+เรียกว่า
+
+**Locality of Reference**
+
+ระหว่างการทำงานของโปรแกรม
+
+การอ้างอิงหน่วยความจำมักเกิดขึ้นเป็น
+
+- กลุ่มของ instruction
+- กลุ่มของ data
+
+---
+
+## ตัวอย่าง
+
+โปรแกรมมักมี
+
+- loops
+- subroutines
+
+ซึ่งทำให้เกิด
+
+- การอ้างถึง instruction เดิมซ้ำ
+- การเข้าถึง array บางตำแหน่งซ้ำ
+
+ดังนั้น
+
+ในช่วงเวลาสั้น ๆ
+
+processor มักทำงานกับ **cluster ของข้อมูลเดิม**
+
+---
+
+# Example 4.1
+
+สมมติว่า processor มีหน่วยความจำสองระดับ
+
+## Level 1
+- 1000 words
+- Access time = **0.01 μs**
+
+## Level 2
+- 100,000 words
+- Access time = **0.1 μs**
+
+---
+
+เมื่อ processor ต้องการอ่าน word
+
+1. จะตรวจสอบ **Level 1 ก่อน**
+2. ถ้าไม่พบ จะไปอ่านที่ **Level 2**
+
+---
+
+ให้ H = hit ratio
+
+หมายถึง
+
+> สัดส่วนของการเข้าถึงที่พบข้อมูลใน Level 1
+
+---
+
+ค่า **Average Access Time**
+
+คำนวณได้จาก Average Time = H × T1 + (1 − H) × (T1 + T2)
+
+---
+
+## Example Calculation
+
+สมมติว่า95% ของการเข้าถึงพบข้อมูลใน Level 1
+
+ดังนั้น
+(0.95)(0.01 μs) + (0.05)(0.01 μs + 0.1 μs)
+
+= 0.0095 + 0.0055
+= 0.015 μs
+
+---
+
+ค่าเฉลี่ย **ใกล้กับ 0.01 μs มากกว่า 0.1 μs**
+
+ซึ่งเป็นผลที่ต้องการ
+
+---
+
+# Hit และ Miss
+
+**Hit**
+
+คือกรณีที่
+
+> พบข้อมูลในหน่วยความจำระดับที่เร็วกว่า
+
+**Miss**
+
+คือกรณีที่
+
+> ไม่พบข้อมูลในหน่วยความจำระดับที่เร็วกว่า
+---
+
+# Memory Hierarchy (continued)
+
+หน่วยความจำที่อยู่ใกล้กับ **processor** มากที่สุดจะมีความเร็วสูงที่สุด  
+ตัวอย่างเช่น
+
+**processor registers**
+
+processor ส่วนใหญ่จะมี register หลายตัว  
+บางระบบอาจมี **หลายร้อย register**
+
+---
+
+## Main Memory
+
+หน่วยความจำหลัก (Main Memory) เป็นหน่วยความจำหลักของระบบคอมพิวเตอร์
+
+คุณสมบัติสำคัญ
+
+- แต่ละตำแหน่งมี **address เฉพาะ**
+- ปกติจะใช้ **semiconductor technology**
+- เก็บทั้ง  
+  - program instructions  
+  - data
+
+Cache memory อยู่ **ระหว่าง processor และ main memory**  
+เพื่อเพิ่มประสิทธิภาพการเข้าถึงข้อมูล
+
+---
+
+## External Memory
+
+หน่วยความจำภายนอกเป็น **secondary storage**
+
+ตัวอย่าง
+
+- Disk
+- Removable disk
+- Magnetic tape
+- Optical disk
+
+ข้อมูลใน external memory จะถูกเข้าถึงผ่าน **I/O modules**
+
+---
+
+## Expanded Storage
+
+ระบบบางระบบมีหน่วยความจำเพิ่มที่เรียกว่า **expanded storage**
+
+ตัวอย่าง
+
+**IBM mainframe**
+
+ใช้หน่วยความจำประเภทหนึ่งที่มี
+
+- ความเร็วช้ากว่า main memory
+- ราคาถูกกว่า main memory
+
+จึงถูกจัดเป็นระดับหนึ่งของ **memory hierarchy**
+
+---
+
+## External Storage as Backup
+
+ข้อมูลสามารถถูกย้ายระหว่าง
+
+- main memory
+- expanded storage
+
+เพื่อเพิ่มประสิทธิภาพของระบบ
+
+ข้อมูลที่ถูกใช้น้อยสามารถย้ายไปเก็บไว้ในระดับที่ช้ากว่า
+
+---
+
+## Disk Cache
+
+ส่วนหนึ่งของ **main memory** สามารถใช้เป็น
+
+disk cache ช่วยเพิ่มประสิทธิภาพได้สองวิธี
+
+### 1. Disk Writes
+
+แทนที่จะเขียนข้อมูลขนาดเล็กหลายครั้ง
+
+ระบบจะ
+
+- รวมข้อมูล
+- เขียนเป็น **block ใหญ่**
+
+ทำให้
+
+- disk ทำงานมีประสิทธิภาพมากขึ้น
+- ลดจำนวนการเข้าถึง disk
+
+---
+
+### 2. Disk Reads
+
+ข้อมูลบางส่วนที่ถูกอ่านจาก disk
+
+อาจถูกใช้งานอีกครั้งโดยโปรแกรม
+
+ดังนั้นข้อมูลเหล่านั้นจะถูกเก็บไว้ใน **cache**
+
+เพื่อให้
+
+- โปรแกรมสามารถเข้าถึงข้อมูลจาก cache
+- แทนการอ่านจาก disk ที่ช้ากว่า
+
+---
+
+# Cache Memory
+
+**Cache memory** ถูกออกแบบมาเพื่อรวมข้อดีของหน่วยความจำสองประเภท
+
+- หน่วยความจำเร็ว ราคาแพง
+- หน่วยความจำช้า ราคาถูก
+
+แนวคิดคือ ใช้หน่วยความจำขนาดเล็กแต่เร็ว
+ร่วมกับหน่วยความจำขนาดใหญ่แต่ช้า
+
+---
+
+## หลักการทำงานของ Cache
+
+เมื่อ processor ต้องการอ่านข้อมูล
+
+1. processor จะตรวจสอบข้อมูลใน **cache**
+2. ถ้าพบข้อมูล → ส่งข้อมูลให้ processor
+3. ถ้าไม่พบ → ดึงข้อมูลจาก **main memory**
+
+จากนั้น
+
+- block ของข้อมูลจะถูกคัดลอกเข้า cache
+- เพื่อรองรับการเข้าถึงในอนาคต
+
+---
+
+## Locality of Reference
+
+เนื่องจากหลักการ
+Locality of Reference
+
+ถ้า block หนึ่งถูกเข้าถึง
+
+มีโอกาสสูงที่
+
+- ตำแหน่งเดิมจะถูกใช้อีก
+- หรือข้อมูลใกล้เคียงจะถูกใช้งาน
+
+---
+
+# Multiple Levels of Cache
+
+ระบบคอมพิวเตอร์สมัยใหม่มักมี cache มากกว่า 1 ระดับ
+
+ตัวอย่าง
+
+- **L1 cache**
+- **L2 cache**
+- **L3 cache**
+
+ลักษณะทั่วไป
+
+| Cache | Speed | Size |
+|------|------|------|
+| L1 | เร็วที่สุด | เล็กที่สุด |
+| L2 | เร็ว | ใหญ่กว่า L1 |
+| L3 | ช้ากว่า | ใหญ่กว่า |
+
+---
+
+# Structure of Cache Memory
+
+Cache ประกอบด้วย
+2^n addressable words
+
+แต่ละ word มี
+n-bit address
+
+---
+
+## Cache Organization
+
+เพื่อให้การจัดการง่ายขึ้น
+
+main memory จะถูกแบ่งเป็น blocks
+
+แต่ละ block มี K words
+ดังนั้น
+
+
+จำนวน blocks ใน main memory
+
+= 2^n / K
+
+---
+
+## Cache Lines
+
+Cache เองก็ถูกแบ่งเป็น cache lines
+แต่ละ cache line มี
+
+---
+
+# Figure 4.3 Cache and Main Memory
+
+## (a) Single Cache
+
+โครงสร้างพื้นฐาน
+CPU → Cache → Main Memory
+
+ความเร็ว
+CPU ↔ Cache = Fast
+Cache ↔ Memory = Slow
+
+---
+
+## (b) Three-Level Cache Organization
+
+โครงสร้าง
+CPU
+↓
+L1 Cache (Fastest)
+↓
+L2 Cache (Fast)
+↓
+L3 Cache (Less fast)
+↓
+Main Memory (Slow)
+
+
+---
+
+# Note about Cache Line
+
+คำว่า
+line
+ถูกใช้แทนคำว่า block
+
+ใน cache
+
+เหตุผลคือ
+
+1. main memory block อาจมีจำนวน word แตกต่างจาก cache line
+2. cache line มีข้อมูลมากกว่า data word เช่น
+
+- tag bits
+- control bits
+
+
+
+
 
