@@ -2331,7 +2331,2721 @@ Block → Any line in a specific set
 | Set Associative | Medium | Medium |
 
 ---   
+# Set-Associative Cache Mapping
 
+> Computer Architecture Notes  
+> Figure 4.13 – 4.15
 
+---
 
+# Mapping from Main Memory to Cache: k-Way Set Associative
+
+Set-Associative Mapping เป็นการผสมระหว่าง
+
+```
+Direct Mapping
+Associative Mapping
+```
+
+แนวคิดคือ
+
+```
+Cache ถูกแบ่งเป็นหลาย sets
+แต่ละ set มีหลาย lines
+```
+
+---
+
+# Figure 4.13 – Mapping from Main Memory to Cache
+
+## (a) v Associative-Mapped Caches
+
+Main memory blocks
+
+```
+B0
+B1
+...
+Bj
+```
+
+สามารถ map ไปยัง
+
+```
+Cache memory set 0
+Cache memory set 1
+...
+Cache memory set v−1
+```
+
+---
+
+## (b) k Direct-Mapped Caches
+
+Cache แบ่งเป็นหลาย **ways**
+
+```
+Cache way 1
+Cache way 2
+...
+Cache way k
+```
+
+แต่ละ way ทำงานเหมือน
+
+```
+Direct-mapped cache
+```
+
+---
+
+# Associativity Concept
+
+ระดับของ associativity
+
+```
+k-way set associative cache
+```
+
+หมายถึง
+
+```
+แต่ละ set มี k lines
+```
+
+ตัวอย่าง
+
+```
+2-way set associative
+4-way set associative
+8-way set associative
+```
+
+---
+
+# Address Structure
+
+Memory address แบ่งเป็น
+
+```
++------+-------+------+
+| Tag  | Set   | Word |
++------+-------+------+
+```
+
+---
+
+# Address Fields
+
+| Field | Description |
+|------|-------------|
+| Tag | ใช้ตรวจสอบ block ที่อยู่ใน cache |
+| Set | ใช้เลือก set |
+| Word | เลือก word ภายใน block |
+
+---
+
+# Important Parameters
+
+ให้
+
+```
+s = number of bits for main memory block
+d = number of bits for set number
+w = number of bits for word
+```
+
+---
+
+## Address length
+
+```
+(s + w) bits
+```
+
+---
+
+## Number of addressable units
+
+```
+2^(s+w) words or bytes
+```
+
+---
+
+## Block size
+
+```
+2^w words or bytes
+```
+
+---
+
+## Number of blocks in main memory
+
+```
+2^(s+w) / 2^w = 2^s
+```
+
+---
+
+## Number of lines in set
+
+```
+k
+```
+
+---
+
+## Number of sets
+
+```
+v = 2^d
+```
+
+---
+
+## Number of lines in cache
+
+```
+m = kv = k × 2^d
+```
+
+---
+
+## Cache size
+
+```
+Cache size = k × 2^(d+w)
+```
+
+---
+
+## Tag size
+
+```
+Tag = (s − d) bits
+```
+
+---
+
+# Figure 4.14 – k-Way Set Associative Cache Organization
+
+โครงสร้างการทำงาน
+
+```
+Memory Address
+      │
+      ▼
++------+-------+------+
+| Tag  | Set   | Word |
++------+-------+------+
+      │
+      ▼
+Select Cache Set
+      │
+      ▼
+Compare Tag with all lines in set
+      │
+ ┌────┴────┐
+ │         │
+Hit       Miss
+```
+
+---
+
+# Cache Operation
+
+1. CPU ส่ง **Memory Address**
+2. ส่วน **Set** ใช้เลือก cache set
+3. Cache จะตรวจสอบ **Tag ทุก line ใน set**
+4. ถ้าพบ tag ตรงกัน
+
+```
+Cache Hit
+```
+
+5. ถ้าไม่พบ
+
+```
+Cache Miss
+```
+
+---
+
+# Example 4.2c – Two-Way Set Associative Mapping
+
+ระบบตัวอย่างใช้
+
+```
+2-way set associative cache
+```
+
+Cache มี
+
+```
+16K lines
+```
+
+แบ่งเป็น
+
+```
+8192 sets
+```
+
+เพราะ
+
+```
+2 lines per set
+```
+
+---
+
+# Address Format Example
+
+Memory address
+
+```
+24 bits
+```
+
+แบ่งเป็น
+
+```
++------+-----------+------+
+| Tag  | Set       | Word |
++------+-----------+------+
+| 9 bits | 13 bits | 2 bits |
+```
+
+---
+
+# Mapping Function
+
+Block number
+
+```
+j
+```
+
+Set number
+
+```
+i = j mod 2^13
+```
+
+ดังนั้น
+
+Main memory blocks
+
+```
+000000
+...
+FF8000
+```
+
+จะ map ไปยัง
+
+```
+Set 0
+```
+
+---
+
+# Example Cache Content
+
+| Tag | Data | Set |
+|----|------|-----|
+| 000 | 13579246 | 0000 |
+| 02C | 77777777 | 02C |
+| 02C | FEDCBA98 | 02C |
+| 1FF | 11223344 | 1FF |
+
+---
+
+# Example Operation
+
+เมื่อ CPU ต้องการข้อมูล
+
+1. อ่าน **Set number**
+2. ไปยัง **Set นั้นใน cache**
+3. ตรวจสอบ **Tag ของทุก line ใน set**
+
+ถ้า
+
+```
+Tag match
+```
+
+จะเกิด
+
+```
+Cache Hit
+```
+
+ถ้า
+
+```
+Tag mismatch
+```
+
+จะเกิด
+
+```
+Cache Miss
+```
+
+---
+
+# Comparison of Cache Mapping
+
+| Mapping Type | Block Placement | Hardware Complexity |
+|--------------|----------------|---------------------|
+| Direct | 1 Line เท่านั้น | Low |
+| Associative | Any Line | High |
+| Set Associative | Any line in a set | Medium |
+
+---
+
+# Summary
+
+Direct Mapping
+
+```
+Block → 1 specific line
+```
+
+Associative Mapping
+
+```
+Block → Any cache line
+```
+
+Set-Associative Mapping
+
+```
+Block → Any line within a specific set
+```
+
+ข้อดี
+
+```
+✔ ลด conflict miss
+✔ Hardware complexity ปานกลาง
+✔ Performance ดี
+```
+
+---
+# Cache Performance, Replacement Algorithms, and Write Policies
+
+> Computer Architecture Notes  
+> Figure 4.16 – Replacement Algorithms – Write Policy – Cache Coherency
+
+---
+
+# Figure 4.16 – Varying Associativity over Cache Size
+
+กราฟแสดงความสัมพันธ์ระหว่าง
+
+```
+Cache Size
+Associativity
+Hit Ratio
+```
+
+### แนวโน้มที่พบ
+
+- เมื่อ **Cache Size เพิ่มขึ้น → Hit Ratio เพิ่มขึ้น**
+- เมื่อ **Associativity เพิ่มขึ้น → Hit Ratio ดีขึ้น**
+
+ประเภทที่เปรียบเทียบ
+
+```
+Direct mapping
+Two-way set associative
+Four-way set associative
+Eight-way set associative
+Sixteen-way set associative
+```
+
+---
+
+## Observations
+
+### Extreme Cases
+
+```
+k = 1
+```
+
+จะเท่ากับ
+
+```
+Direct Mapping
+```
+
+---
+
+```
+k = m
+```
+
+จะเท่ากับ
+
+```
+Fully Associative Mapping
+```
+
+---
+
+### Most Common Organization
+
+รูปแบบที่นิยมมากที่สุดคือ
+
+```
+Two-way set associative
+```
+
+เพราะ
+
+```
+balance ระหว่าง performance และ hardware complexity
+```
+
+---
+
+### Performance Insight
+
+- **Four-way set associative** ให้ improvement เพิ่มขึ้นเล็กน้อย
+- การเพิ่ม associativity มากเกินไปให้ประโยชน์น้อย
+
+ตัวอย่าง
+
+```
+Difference between 2-way and 4-way
+< difference between 4 KB and 8 KB cache size
+```
+
+---
+
+### Practical Observation
+
+เพิ่ม cache size ถึงประมาณ
+
+```
+32 KB
+```
+
+หลังจากนั้น
+
+```
+Performance improvement ลดลง
+```
+
+---
+
+# Replacement Algorithms
+
+เมื่อ cache เต็มและมี block ใหม่ต้องเข้ามา
+
+```
+Block หนึ่งต้องถูกแทนที่
+```
+
+---
+
+## Direct Mapping
+
+Direct mapping
+
+```
+ไม่มีตัวเลือก
+```
+
+ต้อง replace block ที่ถูกกำหนดไว้แล้ว
+
+---
+
+## Associative / Set Associative
+
+ต้องใช้
+
+```
+Replacement Algorithm
+```
+
+เพื่อเลือก block ที่จะถูกแทนที่
+
+---
+
+# Most Common Replacement Algorithms
+
+## 1. Least Recently Used (LRU)
+
+แนวคิด
+
+```
+Replace block that has not been used for the longest time
+```
+
+ขั้นตอน
+
+- บันทึกการใช้งาน block
+- block ที่ถูกใช้ล่าสุดจะถูกเลื่อนขึ้น
+- block ที่ใช้น้อยสุดจะถูกลบ
+
+ข้อดี
+
+```
+Hit ratio ดี
+```
+
+ข้อเสีย
+
+```
+Hardware ซับซ้อน
+```
+
+---
+
+## 2. First-In First-Out (FIFO)
+
+แนวคิด
+
+```
+Replace the block that has been in cache the longest
+```
+
+ลักษณะ
+
+```
+Queue based
+```
+
+ข้อดี
+
+```
+ง่ายต่อการ implement
+```
+
+---
+
+## 3. Least Frequently Used (LFU)
+
+แนวคิด
+
+```
+Replace block that has the smallest reference count
+```
+
+ข้อเสีย
+
+```
+ต้องเก็บ counter สำหรับทุก block
+```
+
+---
+
+## 4. Random Replacement
+
+แนวคิด
+
+```
+Randomly select a block to replace
+```
+
+ข้อดี
+
+```
+Hardware ง่าย
+```
+
+---
+
+# Replacement Algorithm Comparison
+
+| Algorithm | Idea | Complexity |
+|----------|------|-----------|
+| LRU | Replace least recently used | High |
+| FIFO | Replace oldest block | Low |
+| LFU | Replace least frequently used | Medium |
+| Random | Random selection | Very Low |
+
+---
+
+# Write Policy
+
+เมื่อ CPU ต้องการ **write data ลง cache**
+
+มี 2 แนวทางหลัก
+
+```
+Write-through
+Write-back
+```
+
+---
+
+# Write-Through
+
+แนวคิด
+
+```
+Write data to cache AND main memory simultaneously
+```
+
+ข้อดี
+
+```
+Main memory always up-to-date
+```
+
+ข้อเสีย
+
+```
+Memory traffic สูง
+```
+
+---
+
+# Write-Back
+
+แนวคิด
+
+```
+Write only to cache
+```
+
+Main memory จะถูก update
+
+```
+เมื่อ block ถูก replace
+```
+
+ใช้
+
+```
+Dirty bit
+```
+
+เพื่อบอกว่า block ถูกแก้ไขแล้วหรือไม่
+
+---
+
+# Dirty Bit
+
+```
+1 = block modified
+0 = block clean
+```
+
+ถ้า dirty bit = 1
+
+```
+ต้อง write block กลับ main memory ก่อน replace
+```
+
+---
+
+# Write Policy Comparison
+
+| Policy | Memory Traffic | Complexity |
+|------|---------------|-----------|
+| Write-through | High | Low |
+| Write-back | Low | Higher |
+
+---
+
+# Example 4.3
+
+กำหนด
+
+```
+Cache line size = 32 bytes
+```
+
+Main memory
+
+```
+30 ns per word write
+```
+
+สมมุติว่า block ถูกเขียน
+
+```
+8 ครั้ง
+```
+
+---
+
+### Write-Through
+
+ต้องเขียน
+
+```
+8 writes
+```
+
+ใช้เวลา
+
+```
+8 × 30 ns = 240 ns
+```
+
+---
+
+### Write-Back
+
+เขียน main memory
+
+```
+ครั้งเดียว
+```
+
+ใช้เวลา
+
+```
+30 ns
+```
+
+---
+
+### Conclusion
+
+```
+Write-back efficient เมื่อ block ถูกเขียนหลายครั้ง
+```
+
+---
+
+# Cache Coherency Problem
+
+ในระบบ
+
+```
+Multiprocessor
+Shared Memory
+```
+
+CPU หลายตัวมี cache ของตัวเอง
+
+ปัญหาที่เกิดขึ้น
+
+```
+Cache copies อาจไม่เหมือนกัน
+```
+
+---
+
+# Cache Coherency Solutions
+
+## 1. Bus Watching
+
+Cache controllers
+
+```
+monitor address lines
+```
+
+ถ้า processor อื่น update memory
+
+```
+invalidate cache entry
+```
+
+---
+
+## 2. Hardware Transparency
+
+hardware จะ
+
+```
+update all caches automatically
+```
+
+---
+
+## 3. Noncacheable Memory
+
+กำหนดบาง memory region
+
+```
+noncacheable
+```
+
+เพื่อป้องกัน coherency problem
+
+---
+
+# Summary
+
+Cache design มีหลายองค์ประกอบ
+
+```
+Mapping
+Replacement algorithm
+Write policy
+Cache coherency
+```
+
+ทั้งหมดมีผลต่อ
+
+```
+Performance
+Hardware complexity
+System cost
+```
+
+---
+# Cache Design Issues: Line Size, Number of Caches, and Cache Organization
+
+> Computer Architecture Notes  
+> Topics: Line Size, Multilevel Cache, Unified vs Split Cache
+
+---
+
+# Cache Coherency
+
+Cache coherency เป็นหัวข้อวิจัยที่สำคัญในระบบ multiprocessor  
+รายละเอียดเพิ่มเติมมักศึกษาในหัวข้อ **advanced computer architecture**
+
+---
+
+# Line Size
+
+อีกหนึ่งองค์ประกอบสำคัญของ cache design คือ
+
+```
+Line Size
+```
+
+เมื่อ block ของข้อมูลถูกนำเข้ามาใน cache
+
+```
+ข้อมูลที่อยู่ติดกัน (adjacent words)
+```
+
+มักจะถูกนำเข้ามาด้วย
+
+---
+
+## Principle of Locality
+
+เหตุผลคือ
+
+```
+Programs exhibit locality
+```
+
+หมายความว่า
+
+```
+ถ้ามีการอ้างอิง word หนึ่ง
+มีแนวโน้มที่จะใช้ word ใกล้เคียงในอนาคต
+```
+
+---
+
+## Effect of Increasing Line Size
+
+เมื่อ **Line Size เพิ่มขึ้น**
+
+ข้อดี
+
+```
+นำ useful data เข้ามาใน cache มากขึ้น
+```
+
+แต่ก็มีข้อเสีย
+
+```
+Hit ratio อาจลดลง
+```
+
+---
+
+## Two Important Effects
+
+### 1. Cache Pollution
+
+block ที่มีขนาดใหญ่
+
+```
+อาจทำให้ cache เต็มเร็ว
+```
+
+และข้อมูลที่มีประโยชน์
+
+```
+ถูก overwrite เร็วขึ้น
+```
+
+---
+
+### 2. Reduced Spatial Locality Benefit
+
+เมื่อ block ใหญ่ขึ้น
+
+```
+แต่ละ word จะอยู่ห่างจาก requested word มากขึ้น
+```
+
+ทำให้
+
+```
+โอกาสที่จะถูกใช้งานลดลง
+```
+
+---
+
+## Typical Line Size
+
+จากการศึกษา
+
+```
+8 – 64 bytes
+```
+
+มักให้ performance ที่ดี
+
+ในระบบ HPC
+
+```
+64 – 128 bytes
+```
+
+---
+
+# Number of Caches
+
+ในอดีต
+
+```
+computer systems มี cache เพียงตัวเดียว
+```
+
+ปัจจุบัน
+
+```
+ใช้ multiple levels of cache
+```
+
+เช่น
+
+```
+L1
+L2
+L3
+```
+
+---
+
+# Multilevel Cache
+
+Cache hierarchy
+
+```
+CPU
+ │
+ ▼
+L1 Cache (fastest)
+ │
+ ▼
+L2 Cache
+ │
+ ▼
+L3 Cache
+ │
+ ▼
+Main Memory
+```
+
+---
+
+## On-Chip Cache
+
+Cache รุ่นใหม่มักอยู่
+
+```
+on-chip (inside processor)
+```
+
+ข้อดี
+
+```
+ลด memory latency
+```
+
+---
+
+## External Cache
+
+บางระบบมี
+
+```
+off-chip cache
+```
+
+ซึ่งมักถูกใช้เป็น
+
+```
+L2 cache
+```
+
+---
+
+# Why L2 Cache is Used
+
+ถ้าไม่มี L2 cache
+
+เมื่อ L1 miss
+
+```
+processor ต้องเข้าถึง DRAM โดยตรง
+```
+
+ซึ่ง
+
+```
+ช้ามาก
+```
+
+L2 cache ช่วย
+
+```
+reduce memory access time
+```
+
+---
+
+# Advantages of L2 Cache
+
+1️⃣ ลดจำนวนการเข้าถึง main memory
+
+2️⃣ เพิ่ม performance ของระบบ
+
+3️⃣ ลด bus traffic
+
+---
+
+# Figure 4.17 – Total Hit Ratio
+
+กราฟแสดง
+
+```
+Total Hit Ratio (L1 + L2)
+```
+
+สำหรับ
+
+```
+8 KB และ 16 KB L1 cache
+```
+
+แกน X
+
+```
+L2 Cache Size
+```
+
+แกน Y
+
+```
+Hit Ratio
+```
+
+---
+
+## Observations
+
+### Small L2 Cache
+
+```
+L2 < 8 KB
+```
+
+มีผลต่อ performance
+
+```
+น้อย
+```
+
+---
+
+### Larger L2 Cache
+
+เมื่อ
+
+```
+L2 ≥ 64 KB
+```
+
+performance
+
+```
+เพิ่มขึ้นอย่างเห็นได้ชัด
+```
+
+---
+
+# Unified vs Split Cache
+
+เมื่อมี on-chip cache
+
+มี 2 แนวทาง
+
+```
+Unified Cache
+Split Cache
+```
+
+---
+
+# Unified Cache
+
+Unified cache
+
+```
+ใช้ cache เดียว
+```
+
+สำหรับ
+
+```
+Instructions
+Data
+```
+
+---
+
+## Advantages
+
+1️⃣ สามารถปรับ allocation ได้อัตโนมัติ
+
+เช่น
+
+```
+program ใช้ instructions มากกว่า data
+```
+
+cache จะใช้พื้นที่
+
+```
+เก็บ instructions มากขึ้น
+```
+
+---
+
+2️⃣ Hardware ง่าย
+
+```
+ออกแบบ cache เพียงชุดเดียว
+```
+
+---
+
+# Split Cache
+
+Split cache
+
+```
+Instruction Cache (I-cache)
+Data Cache (D-cache)
+```
+
+---
+
+## Advantages
+
+ลด
+
+```
+contention
+```
+
+ระหว่าง
+
+```
+instruction fetch
+data access
+```
+
+---
+
+## Why Split Cache is Important
+
+ใน pipeline processor
+
+```
+instruction fetch
+execution
+```
+
+เกิดพร้อมกัน
+
+ถ้าใช้ unified cache
+
+```
+requests อาจชนกัน
+```
+
+ทำให้
+
+```
+pipeline stall
+```
+
+---
+
+# Split Cache Solution
+
+Split cache แก้ปัญหา
+
+```
+instruction pipeline interference
+```
+
+โดย
+
+```
+แยก cache สำหรับ instructions และ data
+```
+
+---
+
+# Modern Trend
+
+แนวโน้มของระบบสมัยใหม่
+
+```
+L1 → Split cache
+L2 / L3 → Unified cache
+```
+
+---
+
+# Example: Modern Processors
+
+ตัวอย่างเช่น
+
+```
+IBM Enterprise servers
+```
+
+มี
+
+```
+3 levels of on-chip cache
+```
+
+และ
+
+```
+shared L3 cache
+```
+
+---
+
+# Next Topic
+
+```
+Pentium 4 Cache Organization
+```
+
+ซึ่งเป็นตัวอย่างจริงของ
+
+```
+modern cache architecture
+```
+
+---
+# Intel Cache Evolution and Pentium 4 Cache Organization
+
+> Computer Architecture Notes  
+> Topics: Intel Cache Evolution, Pentium 4 Architecture, Cache Operating Modes
+
+---
+
+# Intel Cache Evolution
+
+ตารางแสดงพัฒนาการของ cache ในโปรเซสเซอร์ Intel
+
+| Problem | Solution | Processor on Which Feature First Appears |
+|-------|---------|--------------------------------|
+| External memory slower than the system bus | Add external cache using faster memory technology | 386 |
+| Increased processor speed results in external bus becoming a bottleneck for cache access | Move external cache on-chip, freeing the same speed as the processor | 486 |
+| Internal cache is rather small due to limited space on chip | Add external L2 cache using faster technology than main memory | 486 |
+| Contention occurs when instruction prefetch and execution units access cache simultaneously | Create separate data and instruction caches | Pentium |
+| Increased processor speed results in external bus becoming a bottleneck for L2 cache access | Create separate back-side bus dedicated to L2 cache | Pentium Pro |
+| Move L2 cache onto processor chip | Pentium II |
+| Applications require massive datasets and rapid access | Add external L3 cache | Pentium III |
+| Move L3 cache on-chip | Pentium 4 |
+
+---
+
+# Pentium Cache Organization
+
+Pentium processors use
+
+```
+Set-associative cache organization
+```
+
+ทุก Pentium processor มี
+
+```
+Two on-chip L1 caches
+```
+
+- Instruction cache
+- Data cache
+
+---
+
+## Pentium 4 L1 Cache
+
+L1 Data Cache
+
+```
+Size = 16 KB
+Line size = 64 bytes
+Organization = 4-way set associative
+```
+
+---
+
+## Pentium 4 L2 Cache
+
+Pentium 4 ยังมี
+
+```
+L2 cache feeding both L1 caches
+```
+
+ลักษณะ
+
+```
+8-way set associative
+Size = 512 KB
+Line size = 128 bytes
+```
+
+---
+
+## L3 Cache
+
+เพิ่มใน
+
+```
+Pentium III
+```
+
+และ
+
+```
+High-end Pentium 4
+```
+
+---
+
+# Pentium 4 Processor Components
+
+Pentium 4 processor มีองค์ประกอบหลัก
+
+```
+Fetch / Decode Unit
+Out-of-order Execution Logic
+Execution Units
+Memory Subsystem
+```
+
+---
+
+# Fetch / Decode Unit
+
+หน้าที่
+
+```
+Fetch instructions
+Decode into micro-operations
+Store results in L1 cache
+```
+
+---
+
+# Out-of-Order Execution Logic
+
+ทำหน้าที่
+
+```
+Schedule execution of micro-operations
+```
+
+คุณสมบัติ
+
+- จัดลำดับ execution ใหม่ได้
+- รองรับ speculative execution
+
+---
+
+# Pentium 4 Block Diagram
+
+องค์ประกอบสำคัญ
+
+```
+L1 Instruction Cache
+Instruction Fetch/Decode Unit
+Integer Register File
+Floating Point Register File
+Execution Units
+L1 Data Cache
+L2 Cache
+L3 Cache
+System Bus
+```
+
+---
+
+## Execution Units
+
+ประกอบด้วย
+
+```
+Simple Integer ALU
+Complex Integer ALU
+Load Address Unit
+Store Address Unit
+Floating Point / MMX Unit
+FP Move Unit
+```
+
+---
+
+# Cache Operating Modes
+
+Pentium 4 cache สามารถทำงานได้หลาย mode
+
+| CD | NW | Cache Fills | Write Throughs | Invalidates |
+|----|----|-------------|---------------|-------------|
+| 0 | 0 | Enabled | Enabled | Enabled |
+| 0 | 1 | Disabled | Enabled | Enabled |
+| 1 | 0 | Disabled | Disabled | Disabled |
+
+Note
+
+```
+CD = 0 and NW = 1 is invalid
+```
+
+---
+
+# Execution Units
+
+Execution units ทำงานโดย
+
+```
+Fetch micro-operations
+```
+
+จาก
+
+```
+L1 Data Cache
+```
+
+ผลลัพธ์จะถูกเก็บใน
+
+```
+Registers
+```
+
+---
+
+# Memory Subsystem
+
+ประกอบด้วย
+
+```
+L2 cache
+L3 cache
+System bus
+```
+
+ใช้สำหรับ
+
+```
+Access main memory
+Access I/O resources
+```
+
+---
+
+# Pentium 4 Instruction Decoding
+
+Pentium 4 แปล
+
+```
+Complex x86 instructions
+```
+
+เป็น
+
+```
+Micro-operations
+```
+
+ซึ่ง
+
+```
+ง่ายต่อการ execute ใน pipeline
+```
+
+---
+
+# Micro-Operations Advantages
+
+ข้อดี
+
+```
+Simplifies pipeline design
+Improves scheduling
+Improves performance
+```
+
+---
+
+# Cache Write Policy
+
+Pentium 4 ใช้
+
+```
+Write-back cache policy
+```
+
+แต่สามารถกำหนดให้
+
+```
+Write-through
+```
+
+ได้ด้วย
+
+```
+Control bits
+```
+
+---
+
+# Cache Control Bits
+
+Control bits
+
+```
+CD (Cache Disable)
+NW (Not Write-through)
+```
+
+ใช้ควบคุม
+
+```
+Cache behavior
+```
+
+---
+
+# Cache Control Instructions
+
+Pentium 4 มี instruction สำหรับจัดการ cache เช่น
+
+```
+INVD
+WBINVD
+```
+
+---
+
+## INVD
+
+```
+Invalidate internal cache
+```
+
+---
+
+## WBINVD
+
+```
+Write back and invalidate internal cache
+```
+
+---
+
+# Cache Organization
+
+ทั้ง
+
+```
+L2 cache
+L3 cache
+```
+
+ใช้
+
+```
+8-way set associative organization
+```
+
+และ
+
+```
+Line size = 128 bytes
+```
+
+---
+
+# Key Terms
+
+คำศัพท์สำคัญ
+
+| Term | Meaning |
+|------|--------|
+| Access time | เวลาในการเข้าถึงข้อมูลใน memory |
+| Cache line | หน่วยของข้อมูลที่เก็บใน cache |
+| Cache memory | หน่วยความจำความเร็วสูงระหว่าง CPU และ RAM |
+| Cache hit | ข้อมูลที่ต้องการอยู่ใน cache |
+| Cache miss | ข้อมูลไม่อยู่ใน cache |
+| Associative mapping | mapping ที่ block อยู่ได้หลายตำแหน่ง |
+| Cache set | กลุ่มของ cache lines |
+| Data cache | cache สำหรับข้อมูล |
+| Direct access | การเข้าถึง memory โดยตรง |
+
+---
+
+# Summary
+
+Pentium 4 cache architecture ประกอบด้วย
+
+```
+L1 cache
+L2 cache
+L3 cache
+```
+
+ใช้
+
+```
+Set-associative organization
+Write-back policy
+Micro-operation execution
+```
+
+เพื่อ
+
+```
+Increase performance
+Reduce memory latency
+Improve pipeline efficiency
+```
+
+---
+# Cache Memory – Key Terms, Review Questions, and Problems
+
+---
+
+# Key Terms
+
+# Cache Memory – คำศัพท์สำคัญ คำถามทบทวน และโจทย์
+
+---
+
+# คำศัพท์สำคัญ (Key Terms)
+
+| คำศัพท์ | ความหมาย |
+|-----|--------|
+| Direct mapping | วิธีการแมปของแคชที่แต่ละบล็อกของหน่วยความจำหลักจะถูกแมปไปยังแคชไลน์เพียงตำแหน่งเดียว |
+| High-performance computing (HPC) | การประมวลผลประสิทธิภาพสูงที่มุ่งเน้นความเร็วและพลังการคำนวณ |
+| Hit | การเข้าถึงข้อมูลที่พบข้อมูลที่ต้องการอยู่ในแคช |
+| Hit ratio | อัตราส่วนของการเข้าถึงหน่วยความจำที่พบข้อมูลในแคช |
+| Instruction cache | แคชที่ใช้เก็บคำสั่งของโปรแกรม |
+| L1 cache | แคชระดับที่ 1 ซึ่งอยู่ใกล้ CPU มากที่สุด |
+| L2 cache | แคชระดับที่ 2 |
+| L3 cache | แคชระดับที่ 3 |
+| Line size | ขนาดของ cache line |
+| Locality | แนวโน้มที่โปรแกรมจะเข้าถึงข้อมูลเดิมหรือข้อมูลที่อยู่ใกล้กัน |
+| Logical cache | แคชที่อ้างอิงโดยใช้ logical address |
+| Memory hierarchy | โครงสร้างลำดับชั้นของหน่วยความจำตามความเร็วและขนาด |
+| Miss | การเข้าถึงข้อมูลที่ไม่พบในแคช |
+| Multilevel cache | การใช้แคชหลายระดับ |
+| Physical address | ที่อยู่จริงของหน่วยความจำที่ฮาร์ดแวร์ใช้ในการเข้าถึง |
+| Random access | การเข้าถึงตำแหน่งใด ๆ ของหน่วยความจำโดยใช้เวลาเท่ากัน |
+| Replacement algorithm | อัลกอริทึมที่ใช้เลือกบล็อกในแคชที่จะถูกแทนที่ |
+| Secondary memory | หน่วยความจำสำรอง เช่น ฮาร์ดดิสก์ |
+| Sequential access | การเข้าถึงข้อมูลตามลำดับ |
+| Set-associative mapping | วิธีแมประหว่าง direct mapping และ associative mapping |
+| Spatial locality | การเข้าถึงตำแหน่งข้อมูลที่อยู่ใกล้กัน |
+| Split cache | การแยกแคชสำหรับคำสั่งและข้อมูล |
+| Tag | ตัวระบุที่ใช้ตรวจสอบว่าบล็อกของหน่วยความจำอยู่ในแคชหรือไม่ |
+| Temporal locality | การเข้าถึงข้อมูลเดิมซ้ำในช่วงเวลาสั้น ๆ |
+| Unified cache | แคชเดียวที่ใช้เก็บทั้งคำสั่งและข้อมูล |
+| Virtual address | ที่อยู่หน่วยความจำที่ CPU สร้างขึ้นก่อนถูกแปลงเป็น physical address |
+| Virtual cache | แคชที่ทำงานโดยใช้ virtual address |
+| Write-back | การเขียนข้อมูลลงแคชก่อน แล้วค่อยอัปเดตหน่วยความจำหลักภายหลัง |
+| Write-through | การเขียนข้อมูลลงแคชและหน่วยความจำหลักพร้อมกัน |
+
+---
+
+# คำถามทบทวน (Review Questions)
+
+### 4.1
+อธิบายความแตกต่างระหว่าง
+
+- Sequential access (การเข้าถึงตามลำดับ)  
+- Direct access (การเข้าถึงโดยตรง)  
+- Random access (การเข้าถึงแบบสุ่ม)
+
+---
+
+### 4.2
+ความสัมพันธ์โดยทั่วไประหว่าง
+
+- เวลาในการเข้าถึงหน่วยความจำ (Memory access time)
+- ต้นทุนหน่วยความจำ (Memory cost)
+- ความจุหน่วยความจำ (Memory capacity)
+
+คืออะไร
+
+---
+
+### 4.3
+หลักการ **Locality** เกี่ยวข้องกับการใช้ **หน่วยความจำหลายระดับ (Multiple memory levels)** อย่างไร
+
+---
+
+### 4.4
+อธิบายความแตกต่างระหว่าง
+
+- Direct mapping
+- Associative mapping
+- Set-associative mapping
+
+---
+
+### 4.5
+สำหรับ **Direct-mapped cache**
+
+ที่อยู่ของหน่วยความจำหลัก (Main memory address) ประกอบด้วย **3 ส่วน**
+
+จงระบุและอธิบายส่วนต่าง ๆ เหล่านั้น
+
+---
+
+### 4.6
+สำหรับ **Associative cache**
+
+ที่อยู่ของหน่วยความจำหลักประกอบด้วย **2 ส่วน**
+
+จงระบุและอธิบาย
+
+---
+
+### 4.7
+สำหรับ **Set-associative cache**
+
+ที่อยู่ของหน่วยความจำหลักประกอบด้วย **3 ส่วน**
+
+จงระบุและอธิบาย
+
+---
+
+### 4.8
+ความแตกต่างระหว่าง
+
+- Spatial locality
+- Temporal locality
+
+คืออะไร
+
+---
+
+### 4.9
+โดยทั่วไปมีวิธีการใดบ้างในการใช้ประโยชน์จาก
+
+- Spatial locality
+- Temporal locality
+
+---
+
+# โจทย์ (Problems)
+
+---
+
+## 4.1
+
+แคชแบบ **set-associative** มี
+
+```
+64 lines
+แบ่งเป็นชุดละ 4 lines
+```
+
+หน่วยความจำหลักมี
+
+```
+4K blocks
+ขนาด block = 128 words
+```
+
+จงแสดง **รูปแบบของ address ของ main memory**
+
+---
+
+## 4.2
+
+แคชแบบ **two-way set-associative** มี
+
+```
+ขนาดบล็อก = 16 bytes
+ขนาดรวมของ cache = 8 KB
+หน่วยความจำหลักเป็นแบบ byte addressable
+```
+
+จงแสดง **รูปแบบของ main memory address**
+
+---
+
+## 4.3
+
+กำหนด address ของหน่วยความจำ
+
+```
+111111
+666666
+BBBBBB
+```
+
+(ในรูปแบบ hexadecimal)
+
+จงแสดง
+
+### a) รูปแบบ Direct-mapped cache
+
+ส่วนประกอบ
+
+```
+Tag
+Line
+Word
+```
+
+---
+
+### b) รูปแบบ Associative cache
+
+ส่วนประกอบ
+
+```
+Tag
+Word
+```
+
+---
+
+### c) รูปแบบ Two-way set-associative
+
+ส่วนประกอบ
+
+```
+Tag
+Set
+Word
+```
+
+---
+
+## 4.4
+
+จงระบุค่าต่อไปนี้
+
+### a) สำหรับตัวอย่าง Direct cache
+
+- ความยาวของ address  
+- จำนวนหน่วยที่สามารถอ้างอิงได้  
+- ขนาด block  
+- จำนวน block ใน main memory  
+- จำนวน lines ใน cache  
+- ขนาดของ tag  
+
+---
+
+### b) สำหรับตัวอย่าง Associative cache
+
+- ความยาวของ address  
+- จำนวนหน่วยที่สามารถอ้างอิงได้  
+- ขนาด block  
+- จำนวน block ใน main memory  
+- จำนวน lines ใน cache  
+- ขนาดของ tag  
+
+---
+
+### c) สำหรับ Two-way set associative cache
+
+- ความยาวของ address  
+- จำนวนหน่วยที่สามารถอ้างอิงได้  
+- ขนาด block  
+- จำนวน block ใน main memory  
+- จำนวน lines ใน cache  
+- ขนาดของ tag  
+
+---
+
+## 4.5
+
+ไมโครโปรเซสเซอร์ **32-bit** มี
+
+```
+On-chip cache = 16 KB
+4-way set associative
+Cache line size = 32 bytes
+```
+
+จงวาด **โครงสร้างของ address field** ที่ใช้ในการตรวจสอบ
+
+```
+Cache hit
+Cache miss
+```
+
+---
+
+## 4.6
+
+External cache memory มี
+
+```
+Four-way set associative
+Line size = 16 words
+ขนาดรวม = 4K คำ (32-bit words)
+```
+
+Main memory ใช้
+
+```
+24-bit address
+```
+
+จงออกแบบโครงสร้าง cache และแสดงการตีความ address ของโปรเซสเซอร์
+
+---
+
+## 4.7
+
+Intel **80486** มี on-chip unified cache
+
+```
+ขนาด 8 KB
+4-way set associative
+Line size = 32 bytes
+```
+
+Cache line ประกอบด้วย
+
+```
+Valid bit
+Tag
+LRU bits
+```
+
+จงวาด **แผนภาพ cache อย่างง่าย**
+
+---
+
+## 4.8
+
+เครื่องคอมพิวเตอร์มี
+
+```
+Main memory = 2^16 bytes
+Direct mapped cache
+32 lines
+```
+
+### a)
+
+address ขนาด **16 bits** ถูกแบ่งเป็น
+
+```
+Tag
+Line number
+Byte number
+```
+
+อย่างไร
+
+---
+
+### b)
+
+ไบต์ของ address ต่อไปนี้จะถูกเก็บไว้ที่ใดใน cache
+
+```
+0001 0001 0001 1011
+1100 0011 0011 0100
+1101 0000 0001 1101
+1010 0110 1010 1010
+```
+
+---
+
+### c)
+
+สมมติว่า byte
+
+```
+0010 1000 1001 0101
+```
+
+ถูกเก็บใน cache
+
+ไบต์อื่นที่อยู่ใน block เดียวกันจะถูกเก็บที่ใด
+
+---
+
+### d)
+
+Cache สามารถเก็บข้อมูลจากหน่วยความจำหลักได้ทั้งหมดกี่ไบต์
+
+---
+
+### e)
+
+เหตุใดจึงต้องเก็บ **tag** ไว้ใน cache
+
+---
+
+## 4.9
+
+อัลกอริทึม **cache replacement** ของ Intel 80486
+
+Cache มี
+
+```
+128 sets
+แต่ละ set มี 4 blocks
+```
+
+LRU bits
+
+```
+B0
+B1
+B2
+```
+
+### a)
+
+แสดงขั้นตอนการอัปเดต B0 B1 B2
+
+---
+
+### b)
+
+แสดงว่าอัลกอริทึมนี้ประมาณค่า **LRU replacement** ได้อย่างไร
+
+---
+
+### c)
+
+พิสูจน์ว่าเป็น **LRU algorithm ที่แท้จริง**
+
+---
+
+## 4.10
+
+ออกแบบ cache ที่มี
+
+```
+Block size = 16-bit words
+Set size = 2
+Cache size = 4096 words
+Memory size = 64K × 32 bits
+```
+
+แสดง
+
+```
+โครงสร้าง cache
+การตีความ address
+```
+
+---
+
+## 4.11
+
+ระบบหน่วยความจำมี
+
+```
+32-bit address
+Cache line = 64 bytes
+Tag field = 20 bits
+```
+
+จงหา
+
+```
+รูปแบบ address
+จำนวนหน่วยที่อ้างอิงได้
+จำนวน blocks ใน main memory
+จำนวน lines ใน cache
+ขนาด tag
+```
+
+---
+
+## 4.12
+
+คอมพิวเตอร์มี
+
+```
+Main memory = 1 MB
+1 byte ต่อ address
+Cache size = 16 KB
+Block size = 64 bytes
+```
+
+### a)
+
+จงระบุ
+
+```
+Tag
+Line
+Offset
+```
+
+สำหรับ **direct-mapped cache**
+
+---
+
+### b)
+
+ยกตัวอย่าง **สอง address ที่แมปไปยังตำแหน่ง cache เดียวกัน**
+
+---
+
+### c)
+
+สำหรับ address
+
+```
+F001
+CABB
+```
+
+จงหา
+
+```
+Tag
+Line
+Offset
+```
+
+---
+
+### d)
+
+ทำซ้ำสำหรับ **two-way set associative cache**
+
+---
+
+## 4.13
+
+เขียน **pseudo code**
+
+สำหรับอัลกอริทึม
+
+```
+LRU replacement
+```
+
+ใน **four-way set-associative cache**
+
+---
+
+## 4.14
+
+พิจารณา Example 4.3
+
+คำตอบจะเปลี่ยนอย่างไรถ้า
+
+```
+Block transfer time = 30 ns
+Access time = 5 ns
+```
+
+---
+
+## 4.15
+
+พิจารณาโค้ด
+
+```c
+for (i = 0; i < 20; i++)
+    for (j = 0; j < 10; j++)
+        a[i] = a[i] * j;
+```
+
+### a)
+
+ยกตัวอย่าง **Spatial locality**
+
+### b)
+
+ยกตัวอย่าง **Temporal locality**
+
+---
+
+## 4.16
+
+จงขยายสมการ
+
+```
+(4.2)
+(4.3)
+Appendix A
+```
+
+ให้รองรับ **N-level memory hierarchy**
+
+---
+
+## 4.17
+
+ระบบมี
+
+```
+Main memory = 32K words (16-bit)
+Cache = 4K words
+Block size = 4 words
+```
+
+Cache เริ่มต้นว่าง
+
+โปรเซสเซอร์อ่านข้อมูลจาก
+
+```
+0,1,2,...,4351
+```
+
+จงวิเคราะห์พฤติกรรมของ cache
+---
+# Cache Memory – คำศัพท์สำคัญ คำถามทบทวน และโจทย์
+
+---
+
+# คำศัพท์สำคัญ (Key Terms)
+
+| คำศัพท์ | ความหมาย |
+|-------|---------|
+| Direct mapping | วิธีแมปที่บล็อกของหน่วยความจำหลักถูกกำหนดให้ไปยังตำแหน่ง cache เพียงตำแหน่งเดียว |
+| High-performance computing (HPC) | การประมวลผลที่เน้นประสิทธิภาพสูง |
+| Hit | ข้อมูลที่ต้องการพบอยู่ใน cache |
+| Hit ratio | อัตราส่วนของการเข้าถึงหน่วยความจำที่พบข้อมูลใน cache |
+| Instruction cache | cache ที่เก็บคำสั่งของโปรแกรม |
+| L1 cache | cache ระดับที่ 1 ใกล้ CPU มากที่สุด |
+| L2 cache | cache ระดับที่ 2 |
+| L3 cache | cache ระดับที่ 3 |
+| Line size | ขนาดของ cache line |
+| Locality | แนวโน้มที่โปรแกรมจะเข้าถึงข้อมูลเดิมหรือข้อมูลใกล้เคียง |
+| Logical cache | cache ที่อ้างอิงโดยใช้ logical address |
+| Memory hierarchy | โครงสร้างลำดับชั้นของหน่วยความจำ |
+| Miss | ไม่พบข้อมูลที่ต้องการใน cache |
+| Multilevel cache | การใช้ cache หลายระดับ |
+| Physical address | address จริงที่ใช้เข้าถึงหน่วยความจำ |
+| Random access | การเข้าถึงตำแหน่งใดก็ได้ในเวลาเท่ากัน |
+| Replacement algorithm | อัลกอริทึมที่ใช้เลือกบล็อกที่จะถูกแทนที่ใน cache |
+| Secondary memory | หน่วยความจำสำรอง เช่น ฮาร์ดดิสก์ |
+| Sequential access | การเข้าถึงข้อมูลตามลำดับ |
+| Set-associative mapping | วิธีแมปแบบผสมระหว่าง direct และ associative |
+| Spatial locality | การเข้าถึงข้อมูลที่อยู่ใกล้กัน |
+| Split cache | การแยก cache สำหรับคำสั่งและข้อมูล |
+| Tag | ตัวระบุที่ใช้ตรวจสอบว่าข้อมูลอยู่ใน cache หรือไม่ |
+| Temporal locality | การเข้าถึงข้อมูลเดิมซ้ำในช่วงเวลาสั้น ๆ |
+| Unified cache | cache เดียวใช้ทั้งคำสั่งและข้อมูล |
+| Virtual address | address ที่ CPU สร้างก่อนแปลงเป็น physical address |
+| Virtual cache | cache ที่ใช้ virtual address |
+| Write-back | เขียนข้อมูลลง cache ก่อน แล้วค่อยอัปเดตหน่วยความจำหลัก |
+| Write-through | เขียนข้อมูลลง cache และหน่วยความจำหลักพร้อมกัน |
+
+---
+
+# คำถามทบทวน (Review Questions)
+
+### 4.1
+ความแตกต่างระหว่าง
+
+- Sequential access  
+- Direct access  
+- Random access  
+
+คืออะไร
+
+---
+
+### 4.2
+ความสัมพันธ์ระหว่าง
+
+- เวลาเข้าถึงหน่วยความจำ (access time)
+- ต้นทุนหน่วยความจำ
+- ความจุหน่วยความจำ
+
+เป็นอย่างไร
+
+---
+
+### 4.3
+หลักการ **locality** เกี่ยวข้องกับการใช้ **memory หลายระดับ** อย่างไร
+
+---
+
+### 4.4
+อธิบายความแตกต่างระหว่าง
+
+- Direct mapping
+- Associative mapping
+- Set-associative mapping
+
+---
+
+### 4.5
+สำหรับ **direct-mapped cache** address ของ main memory ประกอบด้วย 3 ส่วน
+
+จงบอกและอธิบายส่วนเหล่านั้น
+
+---
+
+### 4.6
+สำหรับ **associative cache** address ของ main memory ประกอบด้วย 2 ส่วน
+
+จงบอกและอธิบาย
+
+---
+
+### 4.7
+สำหรับ **set-associative cache** address ของ main memory ประกอบด้วย 3 ส่วน
+
+จงบอกและอธิบาย
+
+---
+
+### 4.8
+ความแตกต่างระหว่าง
+
+- Spatial locality
+- Temporal locality
+
+คืออะไร
+
+---
+
+### 4.9
+โดยทั่วไปมีวิธีใดบ้างในการใช้ประโยชน์จาก spatial และ temporal locality
+
+---
+
+# โจทย์ (Problems)
+
+---
+
+## 4.18
+
+พิจารณา cache ที่มี
+
+- 4 lines
+- แต่ละ line ขนาด 16 bytes
+
+Main memory ถูกแบ่งเป็น block ขนาด 16 bytes
+
+ให้พิจารณาลำดับ address ต่อไปนี้
+
+```
+0,2,4,6,8,10,12,14
+```
+
+ลำดับนี้ถูกทำซ้ำ 10 ครั้ง
+
+### a
+
+ถ้า cache ใช้ **direct mapping**
+
+คำนวณ **hit ratio**
+
+### b
+
+ถ้า cache ใช้ **two-way set associative**
+
+คำนวณ **hit ratio**
+
+---
+
+## 4.19
+
+กำหนดระบบหน่วยความจำ
+
+```
+Tc = 100 ns
+Tm = 1200 ns
+Cm = 10^-5 $/bit
+```
+
+จงหา
+
+a) ราคาของ main memory ขนาด 1 MB  
+b) ราคาของ 1 MB เมื่อใช้เทคโนโลยี cache  
+c) เวลาเข้าถึงเฉลี่ยเมื่อ hit ratio = 0.95
+
+---
+
+## 4.20
+
+ให้ L1 cache มี
+
+```
+Access time = 1 ns
+Hit ratio = 0.95
+```
+
+a) ต้องมีค่า hit ratio เท่าไรเพื่อให้ performance ดีขึ้น 10%  
+
+b) อธิบายเหตุผลว่าทำไมผลลัพธ์นี้จึงสมเหตุสมผล
+
+---
+
+## 4.21
+
+พิจารณา cache ที่มี
+
+```
+Access time = 2.5 ns
+Block transfer = 64 bytes
+Hit ratio = 0.95
+```
+
+คำนวณ **average access time**
+
+---
+
+## 4.22
+
+ระบบคอมพิวเตอร์มี
+
+```
+Cache access = 20 ns
+Memory access = 60 ns
+```
+
+จงหา **เวลาเฉลี่ยในการเข้าถึงข้อมูล**
+
+---
+
+## 4.23
+
+Cache line ขนาด
+
+```
+64 bytes
+```
+
+มี **dirty lines = 30%**
+
+a) เมื่อ miss rate = 3%  
+คำนวณ traffic ระหว่าง cache และ memory  
+
+b) ทำซ้ำเมื่อใช้ **write-through policy**
+
+c) ทำซ้ำเมื่อ **miss rate = 5%**
+
+d) สรุปผลลัพธ์
+
+---
+
+## 4.24
+
+Motorola **68040 cache**
+
+ข้อมูลจาก memory ใช้เวลา
+
+```
+3 clock cycles
+```
+
+Clock rate
+
+```
+16.67 MHz
+```
+
+คำนวณ **memory cycle length**
+
+---
+
+## 4.25
+
+Processor มี
+
+```
+Memory cycle time = 300 ns
+Instruction rate = 1 MIPS
+```
+
+จงคำนวณ
+
+- การใช้งาน bus
+- ผลกระทบเมื่อมี cache และ miss ratio = 5%
+
+---
+
+## 4.26
+
+สมการ performance ของ cache
+
+```
+Ta = Tc + (1 − H)Tm
+```
+
+โดย
+
+```
+Ta = average access time
+Tc = cache access time
+Tm = memory access time
+H = hit ratio
+```
+
+จงปรับสมการเมื่อใช้
+
+- write-through policy
+- write-back policy
+
+---
+
+## 4.27
+
+กำหนด
+
+```
+Tc = second-level cache access time
+Tm = memory access time
+H1 = hit ratio L1
+H2 = combined hit ratio
+```
+
+จงหาสมการ performance ของระบบ
+
+---
+
+## 4.28
+
+Cache read miss penalty = 1 clock cycle
+
+จงคำนวณ miss penalty เมื่อ
+
+a) line size = 1 word  
+b) line size = 4 words (burst transfer)  
+c) line size = 4 words (single transfer)
+
+---
+
+## 4.29
+
+เมื่อเพิ่ม line size
+
+miss ratio ลดจาก
+
+```
+3.2% → 1.1%
+```
+
+จงคำนวณ **average miss penalty**
+
+---
+
+# Appendix 4A  
+# ประสิทธิภาพของหน่วยความจำสองระดับ
+
+---
+
+## Two-Level Memory
+
+ระบบหน่วยความจำสองระดับประกอบด้วย
+
+```
+Processor
+Cache
+Main Memory
+```
+
+จุดประสงค์คือ
+
+```
+ลดเวลาในการเข้าถึงหน่วยความจำ
+```
+
+โดยใช้หลักการ **locality**
+
+---
+
+## หลักการ Locality
+
+โปรแกรมมักเข้าถึงข้อมูลเป็นกลุ่ม
+
+2 รูปแบบ
+
+```
+Temporal locality
+Spatial locality
+```
+
+---
+
+## เหตุผลที่โปรแกรมมี locality
+
+1. โปรแกรมส่วนใหญ่ทำงานแบบ **ลำดับคำสั่ง**
+
+2. โปรแกรมใช้ **procedure เดิมซ้ำ**
+
+3. มี **loop** ที่ทำงานซ้ำหลายครั้ง
+
+4. ข้อมูลมักอยู่ใน **array หรือ structure**
+
+---
+
+# ตารางลักษณะของ Two-Level Memory
+
+| คุณสมบัติ | Cache + Main Memory | Virtual Memory | Disk Cache |
+|----------|--------------------|---------------|-----------|
+| เวลาเข้าถึง | 5:1 | 10:1 | 10:1 |
+| การจัดการหน่วยความจำ | Hardware | Hardware + OS | Software |
+| ขนาด block/page | 4–128 bytes | 64–4096 bytes | 64–4096 bytes |
+| การเข้าถึงของ CPU | Direct | Indirect | Indirect |
+
+---
+
+# สรุป
+
+ระบบหน่วยความจำหลายระดับช่วย
+
+- ลดเวลาเข้าถึงหน่วยความจำ
+- ใช้ประโยชน์จาก locality
+- เพิ่มประสิทธิภาพของ CPU
+
+ตัวอย่าง
+
+```
+Cache memory
+Virtual memory
+Disk cache
+```
+
+---
 
