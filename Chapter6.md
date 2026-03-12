@@ -1,8 +1,4 @@
 # บทที่ 6: หน่วยความจำภายนอก (External Memory)
-
-> แปลจาก: Computer Organization and Architecture  
-> บทที่ 6: External Memory
-
 ---
 
 ## สารบัญ
